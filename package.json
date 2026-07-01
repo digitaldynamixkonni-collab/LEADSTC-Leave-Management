@@ -1,0 +1,27 @@
+{
+  "name": "leadstc-leave-management",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Audit.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/digitaldynamixkonni-collab/LEADSTC-Leave-Management.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/digitaldynamixkonni-collab/LEADSTC-Leave-Management/issues"
+  },
+  "homepage": "https://github.com/digitaldynamixkonni-collab/LEADSTC-Leave-Management#readme",
+  "devDependencies": {
+    "prettier": "^3.9.4"
+  }
+}
