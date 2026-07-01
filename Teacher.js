@@ -1,95 +1,278 @@
-/*******************************************************
- * LEAD STC Leave Management System
- * Teacher.js
- * Module: Teacher Authentication
- *******************************************************/
+/**
+ * =====================================================
+ * LEAD STC Leave Management System v1.0
+ * Teacher Service
+ * =====================================================
+ */
+
+const TEACHER_SHEET = "Teachers";
 
 /**
- * Register teacher on first login
+ * Return Teacher Sheet
  */
-function registerTeacher(data) {
+function getTeacherSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  return ss.getSheetByName(TEACHER_SHEET);
+}
 
-  const sheet = getSheet(CONFIG.SHEETS.TEACHERS);
+/**
+ * Get all teachers
+ */
+function getTeachers() {
 
-  const rows = sheet.getDataRange().getValues();
+  const sheet = getTeacherSheet();
 
-  // Check if teacher already exists
-  for (let i = 1; i < rows.length; i++) {
+  const values = sheet.getDataRange().getValues();
 
-    if (
-      String(rows[i][2]).toLowerCase() === String(data.email).toLowerCase()
-    ) {
-
-      return {
-        success: true,
-        existing: true,
-        teacherId: rows[i][0],
-        name: rows[i][1]
-      };
-
-    }
-
+  if (values.length <= 1) {
+    return [];
   }
 
-  const teacherId = generateTeacherID();
+  const headers = values.shift();
+
+  return values.map(row => {
+
+    let obj = {};
+
+    headers.forEach((header, index) => {
+      obj[header] = row[index];
+    });
+
+    return obj;
+
+  });
+
+}
+
+/**
+ * Get Teacher by Employee ID
+ */
+function getTeacherByEmployeeId(employeeId) {
+
+  const teachers = getTeachers();
+
+  return teachers.find(t => String(t["Employee ID"]) === String(employeeId));
+
+}
+
+/**
+ * Generate Teacher ID
+ * Example:
+ * TCH0001
+ */
+function generateTeacherId() {
+
+  const sheet = getTeacherSheet();
+
+  const lastRow = sheet.getLastRow();
+
+  if (lastRow <= 1) {
+    return "TCH0001";
+  }
+
+  const lastId = sheet
+    .getRange(lastRow, 1)
+    .getValue();
+
+  const number = parseInt(
+    String(lastId).replace("TCH", "")
+  );
+
+  return "TCH" + Utilities.formatString("%04d", number + 1);
+
+}
+
+/**
+ * Check duplicate Employee ID
+ */
+function employeeExists(employeeId) {
+
+  return getTeachers().some(t =>
+    String(t["Employee ID"]) === String(employeeId)
+  );
+
+}
+
+/**
+ * Add Teacher
+ */
+function addTeacher(data) {
+
+  if (employeeExists(data.employeeId)) {
+    throw new Error("Employee ID already exists.");
+  }
+
+  const sheet = getTeacherSheet();
+
+  const teacherId = generateTeacherId();
+
+  const now = new Date();
 
   sheet.appendRow([
     teacherId,
+    data.employeeId,
     data.name,
-    data.email,
-    data.mobile,
     data.department,
     data.designation,
-    CONFIG.STATUS.ACTIVE,
-    new Date()
+    data.email,
+    data.phone,
+    data.cl,
+    data.sl,
+    data.el,
+    data.status,
+    now,
+    now
   ]);
+
+  logAudit(
+    "Teacher",
+    "ADD",
+    teacherId + " - " + data.name
+  );
 
   return {
     success: true,
-    existing: false,
-    teacherId: teacherId,
-    name: data.name
+    message: "Teacher added successfully."
   };
 
 }
 
-
 /**
- * Login Teacher
+ * Update Teacher
  */
-function loginTeacher(email, mobile) {
+function updateTeacher(data) {
 
-  const sheet = getSheet(CONFIG.SHEETS.TEACHERS);
+  const sheet = getTeacherSheet();
 
-  const rows = sheet.getDataRange().getValues();
+  const values = sheet.getDataRange().getValues();
 
-  for (let i = 1; i < rows.length; i++) {
+  for (let i = 1; i < values.length; i++) {
 
-    if (
-      String(rows[i][2]).toLowerCase() === String(email).toLowerCase() &&
-      String(rows[i][3]) === String(mobile)
-    ) {
+    if (values[i][0] == data.teacherId) {
+
+      sheet.getRange(i + 1, 2).setValue(data.employeeId);
+      sheet.getRange(i + 1, 3).setValue(data.name);
+      sheet.getRange(i + 1, 4).setValue(data.department);
+      sheet.getRange(i + 1, 5).setValue(data.designation);
+      sheet.getRange(i + 1, 6).setValue(data.email);
+      sheet.getRange(i + 1, 7).setValue(data.phone);
+      sheet.getRange(i + 1, 8).setValue(data.cl);
+      sheet.getRange(i + 1, 9).setValue(data.sl);
+      sheet.getRange(i + 1,10).setValue(data.el);
+      sheet.getRange(i + 1,11).setValue(data.status);
+      sheet.getRange(i + 1,13).setValue(new Date());
+
+      logAudit(
+        "Teacher",
+        "UPDATE",
+        data.teacherId
+      );
 
       return {
         success: true,
-        teacher: {
-          teacherId: rows[i][0],
-          name: rows[i][1],
-          email: rows[i][2],
-          mobile: rows[i][3],
-          department: rows[i][4],
-          designation: rows[i][5],
-          status: rows[i][6]
-        }
+        message: "Teacher updated."
       };
 
     }
 
   }
 
-  return {
-    success: false,
-    message: "Teacher not registered."
-  };
+  throw new Error("Teacher not found.");
+
+}
+
+/**
+ * Delete Teacher
+ */
+function deleteTeacher(teacherId) {
+
+  const sheet = getTeacherSheet();
+
+  const values = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < values.length; i++) {
+
+    if (values[i][0] == teacherId) {
+
+      sheet.deleteRow(i + 1);
+
+      logAudit(
+        "Teacher",
+        "DELETE",
+        teacherId
+      );
+
+      return {
+        success: true
+      };
+
+    }
+
+  }
+
+  throw new Error("Teacher not found.");
+
+}
+
+/**
+ * Toggle Active / Inactive
+ */
+function toggleTeacherStatus(teacherId) {
+
+  const sheet = getTeacherSheet();
+
+  const values = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < values.length; i++) {
+
+    if (values[i][0] == teacherId) {
+
+      const current = values[i][10];
+
+      const updated =
+        current == "Active"
+        ? "Inactive"
+        : "Active";
+
+      sheet
+        .getRange(i + 1,11)
+        .setValue(updated);
+
+      sheet
+        .getRange(i + 1,13)
+        .setValue(new Date());
+
+      logAudit(
+        "Teacher",
+        "STATUS",
+        teacherId + " → " + updated
+      );
+
+      return updated;
+
+    }
+
+  }
+
+}
+
+/**
+ * Search
+ */
+function searchTeachers(keyword) {
+
+  keyword = keyword.toLowerCase();
+
+  return getTeachers().filter(t =>
+
+    String(t["Name"]).toLowerCase().includes(keyword) ||
+
+    String(t["Employee ID"]).toLowerCase().includes(keyword) ||
+
+    String(t["Department"]).toLowerCase().includes(keyword) ||
+
+    String(t["Designation"]).toLowerCase().includes(keyword)
+
+  );
 
 }
