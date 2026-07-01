@@ -101,6 +101,184 @@
 
 </div>
 
+<!-- ===========================
+Main Application
+Hidden until login
+============================ -->
+
+<div id="appSection" class="container-fluid d-none mt-4">
+
+    <div class="row">
+
+        <!-- Sidebar -->
+
+        <div class="col-lg-2">
+
+            <div class="list-group shadow-sm">
+
+                <button
+                    class="list-group-item list-group-item-action active"
+                    onclick="showModule('teacherModule')">
+
+                    <i class="bi bi-people-fill"></i>
+                    Teachers
+
+                </button>
+
+                <button
+                    class="list-group-item list-group-item-action"
+                    onclick="showModule('leaveModule')">
+
+                    <i class="bi bi-calendar-check"></i>
+                    Leave Register
+
+                </button>
+
+                <button
+                    class="list-group-item list-group-item-action"
+                    onclick="showModule('settingsModule')">
+
+                    <i class="bi bi-gear-fill"></i>
+                    Settings
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- Content -->
+
+        <div class="col-lg-10">
+
+            <!-- =======================
+Teacher Module
+======================= -->
+
+            <div id="teacherModule">
+
+                <div class="card shadow-sm">
+
+                    <div
+                        class="card-header d-flex justify-content-between align-items-center">
+
+                        <h4 class="mb-0">
+
+                            Teacher Management
+
+                        </h4>
+
+                        <button
+                            class="btn btn-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#teacherModal">
+
+                            <i class="bi bi-plus-circle"></i>
+
+                            Add Teacher
+
+                        </button>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-5">
+
+                                <input
+                                    id="teacherSearch"
+                                    class="form-control"
+                                    placeholder="Search Teacher..."
+                                    onkeyup="searchTeachers()">
+
+                            </div>
+
+                        </div>
+
+                        <div class="table-responsive">
+
+                            <table
+                                class="table table-bordered table-hover align-middle">
+
+                                <thead class="table-light">
+
+                                    <tr>
+
+                                        <th>ID</th>
+
+                                        <th>Employee ID</th>
+
+                                        <th>Name</th>
+
+                                        <th>Department</th>
+
+                                        <th>Designation</th>
+
+                                        <th>Status</th>
+
+                                        <th width="170">
+
+                                            Actions
+
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="teacherTable">
+
+                                    <tr>
+
+                                        <td colspan="7" class="text-center">
+
+                                            Loading...
+
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Future Modules -->
+
+            <div id="leaveModule" class="d-none">
+
+                <div class="alert alert-info">
+
+                    Leave Register Module
+
+                </div>
+
+            </div>
+
+            <div id="settingsModule" class="d-none">
+
+                <div class="alert alert-secondary">
+
+                    Settings Module
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 <!-- Register Modal -->
 
@@ -189,6 +367,145 @@ class="btn btn-success"
 onclick="registerTeacher()">
 
 Register
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="modal fade" id="teacherModal">
+
+<div class="modal-dialog modal-lg">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h5>Add Teacher</h5>
+
+<button
+class="btn-close"
+data-bs-dismiss="modal"></button>
+
+</div>
+
+<div class="modal-body">
+
+<div class="row">
+
+<div class="col-md-6 mb-3">
+
+<label>Employee ID</label>
+
+<input
+id="empId"
+class="form-control">
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Name</label>
+
+<input
+id="teacherName"
+class="form-control">
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Department</label>
+
+<input
+id="teacherDepartment"
+class="form-control">
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Designation</label>
+
+<input
+id="teacherDesignation"
+class="form-control">
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Email</label>
+
+<input
+id="teacherEmail"
+type="email"
+class="form-control">
+
+</div>
+
+<div class="col-md-6 mb-3">
+
+<label>Phone</label>
+
+<input
+id="teacherPhone"
+class="form-control">
+
+</div>
+
+<div class="col-md-4 mb-3">
+
+<label>CL</label>
+
+<input
+id="teacherCL"
+type="number"
+value="12"
+class="form-control">
+
+</div>
+
+<div class="col-md-4 mb-3">
+
+<label>SL</label>
+
+<input
+id="teacherSL"
+type="number"
+value="15"
+class="form-control">
+
+</div>
+
+<div class="col-md-4 mb-3">
+
+<label>EL</label>
+
+<input
+id="teacherEL"
+type="number"
+value="0"
+class="form-control">
+
+</div>
+
+</div>
+
+</div>
+
+<div class="modal-footer">
+
+<button
+class="btn btn-success"
+onclick="saveTeacher()">
+
+Save Teacher
 
 </button>
 
